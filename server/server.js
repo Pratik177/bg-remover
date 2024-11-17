@@ -11,7 +11,11 @@ app.use(express.json());
 
 const PORT = 3000;
 
-connectDB().then(() => {
+app.get('/', (req, res) => {
+    res.send('API is running...');
+});
+
+await connectDB().then(() => {
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
