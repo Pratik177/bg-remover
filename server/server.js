@@ -21,7 +21,7 @@ const PORT = 3000;
 
 //API routes
 app.get('/', (req, res) => {
-    res.send('API is running...12  3');
+    res.send('API is running...12  345');
 });
 app.use('/api/user', userRouter); // Correct import
 

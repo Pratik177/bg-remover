@@ -5,58 +5,36 @@ const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
 const clerkWebhooks = async (req, res) => {
     try {
-        // Verify webhook signature
+        // Verify webhook
         const wh = new Webhook(webhookSecret);
         const payload = JSON.stringify(req.body);
-
         wh.verify(payload, {
             "svix-id": req.headers["svix-id"],
             "svix-timestamp": req.headers["svix-timestamp"],
             "svix-signature": req.headers["svix-signature"],
         });
 
+        // Parse the webhook event
         const { type, data } = req.body;
 
-        // Handle different event types
-        switch (type) {
-            case "user.created": {
-                // Extract user data
-                const userData = {
-                    clerkID: data.id,
-                    email: data.email_addresses[0].email_address,
-                    firstName: data.first_name,
-                    lastName: data.last_name,
-                    photo: data.image_url,
-                };
+        if (type === "user.created") {
+            // Extract user data
+            const userData = {
+                clerkID: data.id,
+                email: data.email_addresses[0].email_address,
+                firstName: data.first_name,
+                lastName: data.last_name,
+                photo: data.image_url,
+            };
 
-                // Save user in MongoDB
-                await userModel.create(userData);
-                console.log("User created in database:", userData);
-                res.status(200).json({ success: true, message: "User created" });
-                break;
-            }
-            case "user.updated": {
-                const updates = {
-                    email: data.email_addresses[0].email_address,
-                    firstName: data.first_name,
-                    lastName: data.last_name,
-                    photo: data.image_url,
-                };
+            // Save user to MongoDB
+            await userModel.create(userData);
 
-                await userModel.findOneAndUpdate({ clerkID: data.id }, updates, { new: true });
-                console.log("User updated in database:", updates);
-                res.status(200).json({ success: true, message: "User updated" });
-                break;
-            }
-            case "user.deleted": {
-                await userModel.findOneAndDelete({ clerkID: data.id });
-                console.log("User deleted from database:", data.id);
-                res.status(200).json({ success: true, message: "User deleted" });
-                break;
-            }
-            default:
-                res.status(400).json({ success: false, message: "Unknown event type" });
+            console.log("User created:", userData);
+            return res.status(200).json({ success: true, message: "User created" });
         }
+
+        res.status(400).json({ success: false, message: "Unhandled event type" });
     } catch (err) {
         console.error("Webhook error:", err.message);
         res.status(400).json({ success: false, message: "Webhook verification failed" });
