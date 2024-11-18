@@ -17,7 +17,6 @@ const clerkWebhoooks = async (req, res) => {
     });
 
     const {data, type} = req.body;
-   
         switch(type){
             case "user.created":{
 
