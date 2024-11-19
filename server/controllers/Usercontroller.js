@@ -9,7 +9,7 @@ const clerkWebhooks = async (req, res) => {
         const wh = new Webhook(webhookSecret);
         const payload = JSON.stringify(req.body);
 
-        wh.verify(payload, {
+       const evt= wh.verify(payload, {
             "svix-id": req.headers["svix-id"],
             "svix-timestamp": req.headers["svix-timestamp"],
             "svix-signature": req.headers["svix-signature"],
