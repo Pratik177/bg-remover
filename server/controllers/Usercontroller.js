@@ -1,68 +1,46 @@
 import { Webhook } from "svix";
-import userModel from "../models/UserModel.js";
+import userModel from "../models/userModel.js";
 
-//api controller function to manage clerk user with database 
-//http://localhost:4000/api/user/webhooks
+const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
+
 const clerkWebhooks = async (req, res) => {
-    try{
-        //create a svix instance with the secret key
-        const whook =new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+    console.log("Headers:", req.headers);
+    console.log("Body:", req.body);
 
-        await whook.verify(json.stringify(req.body),{ 
+    try {
+        const wh = new Webhook(webhookSecret);
+        const payload = JSON.stringify(req.body);
+        wh.verify(payload, {
             "svix-id": req.headers["svix-id"],
             "svix-timestamp": req.headers["svix-timestamp"],
-            "svix-signature": req.headers["svix-signature"]
+            "svix-signature": req.headers["svix-signature"],
         });
-        const {data, type}= req.body;
 
-        switch(type){
-            case "user.created":{
-                //create a new user
-                //add the user to the database
-                const userData= {
-                    clerkId: data.id,
-                    email: data.email_addresses[0].email_address,
+        const { type, data } = req.body;
+
+        switch (type) {
+            case "user.created":
+                const userData = {
+                    clerkID: data.id,
+                    email: data.email_addresses[0]?.email_address || "No email",
                     firstName: data.first_name,
                     lastName: data.last_name,
                     photo: data.image_url,
-                }
+                };
 
                 await userModel.create(userData);
-                res.json({})
-                
+                console.log("User created:", userData);
+                res.status(200).json({ success: true, message: "User created" });
                 break;
-            }
-            case "user.updated":{
-                //update a  user
-                //add the user to the database
-                const userData= {
-                    email: data.email_addresses[0].email_address,
-                    firstName: data.first_name,
-                    lastName: data.last_name,
-                    photo: data.image_url,
-                }
 
-                await userModel.findOneAndUpdate({clerkId:data.id},userData);
-                res.json({})
-                break;
-            }
-            case "user.deleted":{
-                //delete a  user
-                //remove the user from the database
-                await userModel.findOneAndDelete({clerkId:data.id});
-                res.json({})
-
-                break;
-            }
-
+            default:
+                console.log("Unhandled event type:", type);
+                res.status(400).json({ success: false, message: "Unhandled event type" });
         }
-
-
-    }catch(err){
-        console.log(err.message);
-        res.json({success:false,message:err.message});
+    } catch (err) {
+        console.error("Error:", err.message);
+        res.status(400).json({ success: false, message: err.message });
     }
-
 };
 
-export {clerkWebhooks};
+export { clerkWebhooks };
