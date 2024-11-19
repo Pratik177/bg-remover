@@ -6,6 +6,7 @@ import userRouter from './routes/userRoutes.js';
 
 dotenv.config();
 const app = express();
+await connectDB();
 
 const corsOptions = {
     origin: "http://localhost:5173",
@@ -14,8 +15,9 @@ const corsOptions = {
 }
 
 
-app.use(cors(corsOptions));
+//initialize middleware
 app.use(express.json());
+app.use(cors(corsOptions));
 
 const PORT = 3000;
 
@@ -23,14 +25,8 @@ const PORT = 3000;
 app.get('/', (req, res) => {
     res.send('API is running...');
 });
-app.use('/api/user', userRouter); // Correct import
 
-await connectDB().then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error('Failed to connect to MongoDB:', err);
-        process.exit(1);
-    });
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  
+});
