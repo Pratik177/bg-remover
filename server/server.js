@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import connectDB  from './config/mongodb.js'; // Correct default import
-import userRouter from './routes/userRoutes.js';
 
 dotenv.config();
 const app = express();
