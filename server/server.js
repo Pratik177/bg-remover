@@ -9,7 +9,7 @@ await connectDB();
 
 
 
-//initialize middleware
+//initialize middleware as middleware
 app.use(express.json());
 app.use(cors());
 
