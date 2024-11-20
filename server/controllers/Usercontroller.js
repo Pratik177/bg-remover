@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import dotenv from "dotenv";
 dotenv.config();
-
+//api controller funtion to manage clerk user with database
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
 const clerkWebhooks = async (req, res) => {
