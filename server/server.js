@@ -7,16 +7,11 @@ dotenv.config();
 const app = express();
 await connectDB();
 
-const corsOptions = {
-    origin: "http://localhost:5173",
-    methods: "GET,HEAD,PATCH,POST,PUT,DELETE",
-    credentials: true,
-}
 
 
 //initialize middleware
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 
 const PORT = 3000;
 
