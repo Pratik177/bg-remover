@@ -6,10 +6,7 @@ dotenv.config();
 //const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
 const clerkWebhooks = async (req, res) => {
-    console.log("Headers:", req.headers);
-    console.log("Body:", req.body);
-    console.log("Webhook Secret:", webhookSecret); // Debug the secret
-
+   
     try {
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
      //   const payload = JSON.stringify(req.body);
